@@ -275,4 +275,3 @@ if __name__ == "__main__":
         if DEBUG_MODE:
             st.error("Stack trace:")
             st.code(traceback.format_exc())
-EOF < /dev/null
