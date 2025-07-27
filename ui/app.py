@@ -66,43 +66,74 @@ def display_search_results(data):
                     
                     with col1:
                         # Use unique key for each expander
-                        with st.expander(f"Conversation: {result.get('title', 'Untitled')} (ID: {result.get('id', 'Unknown')})", expanded=idx == 0):
-                            # Display conversation metadata
-                            st.markdown(f"**Created:** {result.get('create_time', 'Unknown')}")
-                            st.markdown(f"**Updated:** {result.get('update_time', 'Unknown')}")
+                        with st.expander(f"Conversation: {result.get('title', 'Untitled')} (ID: {result.get('conversation_id', 'Unknown')})", expanded=idx == 0):
+                            # Format timestamps
+                            timestamp = result.get('timestamp', 'Unknown')
+                            updated_at = result.get('updated_at', 'Unknown')
                             
-                            # Display messages
-                            messages = result.get('messages', [])
-                            if messages:
-                                st.markdown("### Messages")
-                                for msg_idx, msg in enumerate(messages):
-                                    role = msg.get('role', 'unknown')
-                                    content = format_snippet(msg.get('content', ''))
-                                    
-                                    if role == 'user':
-                                        st.markdown(f"**👤 User:** {content}")
-                                    elif role == 'assistant':
-                                        st.markdown(f"**🤖 Assistant:** {content}")
-                                    else:
-                                        st.markdown(f"**{role}:** {content}")
-                                    
-                                    st.divider()
+                            if timestamp != 'Unknown':
+                                try:
+                                    dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                                    timestamp = dt.strftime('%B %d, %Y at %I:%M %p')
+                                except:
+                                    pass
+                            
+                            if updated_at != 'Unknown':
+                                try:
+                                    dt = datetime.fromisoformat(updated_at.replace('Z', '+00:00'))
+                                    updated_at = dt.strftime('%B %d, %Y at %I:%M %p')
+                                except:
+                                    pass
+                            
+                            # Display conversation metadata
+                            st.markdown(f"**Created:** {timestamp}")
+                            st.markdown(f"**Updated:** {updated_at}")
+                            st.markdown(f"**Sender:** {result.get('sender', 'Unknown')}")
+                            st.markdown(f"**Message Count:** {result.get('message_count', 0)}")
+                            st.markdown(f"**Relevance Rank:** {result.get('rank', 0):.2f}")
+                            
+                            # Display snippet with formatted marks
+                            snippet = result.get('snippet', '')
+                            if snippet:
+                                st.markdown("### Snippet")
+                                formatted_snippet = format_snippet(snippet)
+                                st.markdown(formatted_snippet)
                     
                     with col2:
                         # Action buttons with unique keys
                         if st.button("Copy ID", key=f"copy_id_{idx}"):
-                            st.code(result.get('id', 'Unknown'))
+                            st.code(result.get('conversation_id', 'Unknown'))
         
         with tab2:
             # Table view
             table_data = []
             for result in results:
+                # Format timestamps for table
+                timestamp = result.get('timestamp', 'Unknown')
+                updated_at = result.get('updated_at', 'Unknown')
+                
+                if timestamp != 'Unknown':
+                    try:
+                        dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                        timestamp = dt.strftime('%Y-%m-%d %H:%M')
+                    except:
+                        pass
+                
+                if updated_at != 'Unknown':
+                    try:
+                        dt = datetime.fromisoformat(updated_at.replace('Z', '+00:00'))
+                        updated_at = dt.strftime('%Y-%m-%d %H:%M')
+                    except:
+                        pass
+                
                 table_data.append({
-                    'ID': result.get('id', 'Unknown'),
+                    'ID': result.get('conversation_id', 'Unknown'),
                     'Title': result.get('title', 'Untitled'),
-                    'Created': result.get('create_time', 'Unknown'),
-                    'Updated': result.get('update_time', 'Unknown'),
-                    'Message Count': len(result.get('messages', []))
+                    'Created': timestamp,
+                    'Updated': updated_at,
+                    'Sender': result.get('sender', 'Unknown'),
+                    'Message Count': result.get('message_count', 0),
+                    'Rank': f"{result.get('rank', 0):.2f}"
                 })
             
             df = pd.DataFrame(table_data)
