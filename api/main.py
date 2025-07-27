@@ -1,5 +1,3 @@
-import prometheus_client
-prometheus_client.REGISTRY.unregister_all()
 """FastAPI application for ChatGPT conversation search."""
 import os
 import sys
