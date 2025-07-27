@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 # API configuration
 API_BASE_URL = os.getenv('API_URL', 'http://localhost:8000')
+logger.info(f"Using API URL: {API_BASE_URL}")
 
 
 def search_conversations(query: str, limit: int = 20, offset: int = 0) -> Dict[str, Any]:
@@ -35,7 +36,10 @@ def search_conversations(query: str, limit: int = 20, offset: int = 0) -> Dict[s
         return response.json()
     except requests.exceptions.RequestException as e:
         logger.error(f"Search API error: {e}")
-        return {"error": str(e), "results": []}
+        error_msg = f"API connection failed: {str(e)}"
+        if hasattr(e, 'response') and e.response is not None:
+            error_msg += f" (Status: {e.response.status_code})"
+        return {"error": error_msg, "results": []}
 
 
 def get_conversation(conversation_id: str) -> Dict[str, Any]:
@@ -212,6 +216,7 @@ def main():
         # Perform search
         if search_button and search_query:
             with st.spinner("Searching..."):
+                st.info(f"Searching API at: {API_BASE_URL}/search")
                 results = search_conversations(search_query)
                 st.session_state.search_results = results
                 
