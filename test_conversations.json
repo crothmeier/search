@@ -1,0 +1,21 @@
+[
+  {
+    "id": "conv-123",
+    "title": "Test Conversation",
+    "create_time": 1234567890,
+    "messages": [
+      {
+        "id": "msg-1",
+        "author": {"role": "user"},
+        "content": {"parts": ["How do I configure SSH certificates?"]},
+        "create_time": 1234567890
+      },
+      {
+        "id": "msg-2",
+        "author": {"role": "assistant"},
+        "content": {"parts": ["SSH certificates provide better security than keys..."]},
+        "create_time": 1234567891
+      }
+    ]
+  }
+]
