@@ -84,7 +84,7 @@ class User(BaseModel):
     scopes: List[str] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
-    @validator("scopes", pre=True, always=True)
+    @field_validator("scopes", pre=True, always=True)
     def set_scopes_based_on_role(cls, v, values):
         """Set default scopes based on role."""
         role = values.get("role", "user")
